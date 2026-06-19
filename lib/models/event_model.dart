@@ -132,4 +132,39 @@ class EventModel {
     this.photoPaths = const [],
     this.nextActionDate,
   });
+
+  // copyWith — returns a new EventModel with only the specified fields changed
+  EventModel copyWith({
+    String? id,
+    int? hiveId,
+    EventType? type,
+    DateTime? date,
+    ColonyStrength? colonyStrength,
+    QueenStatus? queenStatus,
+    BroodQuality? broodQuality,
+    FoodStores? foodStores,
+    double? feedingAmountL,
+    String? syrupRatio,
+    int? framesAdded,
+    String? notes,
+    List<String>? photoPaths,
+    DateTime? nextActionDate,
+  }) {
+    return EventModel(
+      id: id ?? this.id,
+      hiveId: hiveId ?? this.hiveId,
+      type: type ?? this.type,
+      date: date ?? this.date,
+      colonyStrength: colonyStrength ?? this.colonyStrength,
+      queenStatus: queenStatus ?? this.queenStatus,
+      broodQuality: broodQuality ?? this.broodQuality,
+      foodStores: foodStores ?? this.foodStores,
+      feedingAmountL: feedingAmountL ?? this.feedingAmountL,
+      syrupRatio: syrupRatio ?? this.syrupRatio,
+      framesAdded: framesAdded ?? this.framesAdded,
+      notes: notes ?? this.notes,
+      photoPaths: photoPaths ?? this.photoPaths,
+      nextActionDate: nextActionDate ?? this.nextActionDate,
+    );
+  }
 }

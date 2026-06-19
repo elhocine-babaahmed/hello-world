@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/event_model.dart';
+import '../models/reminder_model.dart';
 import '../providers/hives_provider.dart';
 import '../providers/events_provider.dart';
+import '../providers/reminders_provider.dart';
 import 'settings_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -12,7 +14,10 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final hives  = context.watch<HivesProvider>();
     final events = context.watch<EventsProvider>();
+    final reminders = context.watch<RemindersProvider>();
+    
     final recent = events.getRecentEvents(5);
+    final upcoming = reminders.getUpcomingReminders(5);
 
     return Scaffold(
       appBar: AppBar(
@@ -50,10 +55,14 @@ class DashboardScreen extends StatelessWidget {
 
           const SizedBox(height: 24),
 
-          // ── Upcoming tasks — stub until Phase 4 ─────────────────────────
+          // ── Upcoming tasks ───────────────────────────────────────────────
           const _SectionLabel(label: 'UPCOMING TASKS'),
           const SizedBox(height: 10),
-          const _EmptyCard(icon: Icons.event_available_outlined, text: 'No reminders yet — add a next action date when logging an entry'),
+          upcoming.isEmpty
+              ? const _EmptyCard(icon: Icons.event_available_outlined, text: 'No reminders yet — add a next action date when logging an entry')
+              : Column(
+                  children: upcoming.map((reminder) => _UpcomingTaskTile(reminder: reminder)).toList(),
+                ),
 
           const SizedBox(height: 24),
 
@@ -91,7 +100,65 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
+
+class _UpcomingTaskTile extends StatelessWidget {
+  final ReminderModel reminder;
+  const _UpcomingTaskTile({required this.reminder});
+
+  @override
+  Widget build(BuildContext context) {
+    final hive = context.read<HivesProvider>().getById(reminder.hiveId);
+    final isOverdue = reminder.daysUntilDue < 0;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFDF8),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isOverdue ? const Color(0xFFB5564A).withOpacity(0.3) : const Color(0xFFE8DCC2),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 8, height: 8,
+            decoration: BoxDecoration(
+              color: isOverdue ? const Color(0xFFB5564A) : const Color(0xFFD9952F),
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  reminder.title,
+                  style: const TextStyle(fontSize: 13, color: Color(0xFF3A2A18), fontWeight: FontWeight.w500),
+                ),
+                Text(
+                  '${hive?.displayName ?? 'Unknown hive'}',
+                  style: const TextStyle(fontSize: 11, color: Color(0xFFB6A488)),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            reminder.dueDateLabel,
+            style: TextStyle(
+              fontSize: 11,
+              color: isOverdue ? const Color(0xFFB5564A) : const Color(0xFFB6A488),
+              fontWeight: isOverdue ? FontWeight.w600 : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class _ActivityTile extends StatelessWidget {
   final EventModel event;

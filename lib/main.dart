@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/hives_provider.dart';
 import 'providers/events_provider.dart';
+import 'providers/reminders_provider.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/hives_screen.dart';
 import 'screens/calendar_screen.dart';
@@ -20,6 +21,7 @@ class HiveLogApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => HivesProvider()),
         ChangeNotifierProvider(create: (_) => EventsProvider()),
+        ChangeNotifierProvider(create: (_) => RemindersProvider()),
       ],
       child: MaterialApp(
         title: 'Hive Log',
