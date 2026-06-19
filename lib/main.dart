@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'providers/hives_provider.dart';
 import 'providers/events_provider.dart';
 import 'providers/reminders_provider.dart';
+import 'providers/queens_provider.dart';
+import 'providers/settings_provider.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/hives_screen.dart';
 import 'screens/calendar_screen.dart';
@@ -22,34 +24,44 @@ class HiveLogApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => HivesProvider()),
         ChangeNotifierProvider(create: (_) => EventsProvider()),
         ChangeNotifierProvider(create: (_) => RemindersProvider()),
+        ChangeNotifierProvider(create: (_) => QueensProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
       ],
-      child: MaterialApp(
-        title: 'Hive Log',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFD9952F)),
-          scaffoldBackgroundColor: const Color(0xFFFBF3E2),
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Color(0xFFFBF3E2),
-            elevation: 0,
-            scrolledUnderElevation: 0,
-            centerTitle: false,
-            titleTextStyle: TextStyle(
-              color: Color(0xFF3A2A18),
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
+      child: Consumer<SettingsProvider>(
+        builder: (context, settings, _) => MaterialApp(
+          title: 'Hive Log',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            useMaterial3: true,
+            colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFD9952F)),
+            scaffoldBackgroundColor: const Color(0xFFFBF3E2),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFFFBF3E2),
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              centerTitle: false,
+              titleTextStyle: TextStyle(color: Color(0xFF3A2A18), fontSize: 24, fontWeight: FontWeight.w600),
+              iconTheme: IconThemeData(color: Color(0xFF3A2A18)),
             ),
-            iconTheme: IconThemeData(color: Color(0xFF3A2A18)),
+            navigationBarTheme: NavigationBarThemeData(
+              backgroundColor: const Color(0xFFFBF3E2),
+              indicatorColor: const Color(0xFFD9952F).withOpacity(0.18),
+              labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+            ),
           ),
-          navigationBarTheme: NavigationBarThemeData(
-            backgroundColor: const Color(0xFFFBF3E2),
-            indicatorColor: const Color(0xFFD9952F).withOpacity(0.18),
-            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-          ),
+          darkTheme: settings.darkMode ? _darkTheme() : null,
+          home: const MainShell(),
         ),
-        home: const MainShell(),
       ),
+    );
+  }
+
+  ThemeData _darkTheme() {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFD9952F), brightness: Brightness.dark),
+      scaffoldBackgroundColor: const Color(0xFF2A2520),
     );
   }
 }
@@ -79,26 +91,10 @@ class _MainShellState extends State<MainShell> {
         selectedIndex: _currentIndex,
         onDestinationSelected: (i) => setState(() => _currentIndex = i),
         destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.dashboard_outlined),
-            selectedIcon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.hive_outlined),
-            selectedIcon: Icon(Icons.hive),
-            label: 'Hives',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.calendar_today_outlined),
-            selectedIcon: Icon(Icons.calendar_today),
-            label: 'Calendar',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.notifications_outlined),
-            selectedIcon: Icon(Icons.notifications),
-            label: 'Reminders',
-          ),
+          NavigationDestination(icon: Icon(Icons.dashboard_outlined), selectedIcon: Icon(Icons.dashboard), label: 'Dashboard'),
+          NavigationDestination(icon: Icon(Icons.hive_outlined), selectedIcon: Icon(Icons.hive), label: 'Hives'),
+          NavigationDestination(icon: Icon(Icons.calendar_today_outlined), selectedIcon: Icon(Icons.calendar_today), label: 'Calendar'),
+          NavigationDestination(icon: Icon(Icons.notifications_outlined), selectedIcon: Icon(Icons.notifications), label: 'Reminders'),
         ],
       ),
     );
